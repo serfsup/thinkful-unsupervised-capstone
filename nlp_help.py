@@ -22,9 +22,9 @@ from typing import List, Dict
 class LsaPlotting:
     def __init__(self, X_train_lsa: np.ndarray, y_train: pd.Series,
                  X_eval_lsa: np.ndarray, y_eval: pd.Series):
-        """
-        Takes a X_train and X_eval as numpy ndarrays, and y_train and y_eval
-        as pd.Series. Creates class attributes based upon these parameters
+        """Takes a X_train and X_eval as numpy ndarrays, and y_train and 
+        y_eval as pd.Series. Creates class attributes based upon these 
+        parameters.
         """
         self.X_train_lsa = X_train_lsa
         self.y_train = y_train
@@ -38,8 +38,7 @@ class LsaPlotting:
     def compare_plot_2d(self, train_title: str, eval_title: str,
                         comp_0_label: str = 'Component 0',
                         comp_1_label: str = 'Component 1'):
-        """
-        Takes a train_title, an eval_title, a comp_0_label (X-axis) and a
+        """Takes a train_title, an eval_title, a comp_0_label (X-axis) and a
         comp_1_label (Y-axis)and returns a matplotlib figuer with two
         scatterplots based off the data based into the instance of the class.
         A plot of train on the top and a plot of the eval on the bottom.
@@ -64,9 +63,8 @@ class LsaPlotting:
                         comp_0_label: str = 'Component 0',
                         comp_1_label: str = 'Component 1',
                         comp_2_label: str = 'Component 2'):
-        """
-        Takes a train_title and an eval_title as strings uses them as titles to
-        matplotlib 3d plots created by using class attributes.
+        """Takes a train_title and an eval_title as strings uses them as 
+        titles to matplotlib 3d plots created by using class attributes.
         """
         pairs = {p: c for p, c in zip(self.categories, self.colors)}
         _train_df = pd.DataFrame(self.X_train_lsa)
@@ -107,12 +105,11 @@ class LsaPlotting:
         ax2.legend(loc=2)
 
     def compare_plot_interactive(self, X_train: pd.Series, X_eval: pd.Series):
-        """
-        Takes the self.X_train_lsa object (np.ndarray) and converts in into
+        """Takes the self.X_train_lsa object (np.ndarray) and converts in into
         a df, makes column names based on the number of parameters adds a
         column for the lemmas from the corresponding series as well as the
         target. A colormap and plotly tooltips are created as constants. Plots
-        of the first two componets are plotted.
+        of the first two components are plotted.
         """
         _train = pd.DataFrame(self.X_train_lsa)
         col_names = [f'comp_{i}' for i in range(_train.shape[1])]
@@ -129,7 +126,7 @@ class LsaPlotting:
         hover = HoverTool(tooltips=[('President', '@president'),
                                     ('lemmas', '@lemmas'),
                                     ('Components 0 1',
-                                     ('@comp_1, @comp_2'))])
+                                    ('@comp_1, @comp_2'))])
 
         plot_cmap = factor_cmap('president', palette=Category10[10],
                                 factors=_train.president.unique())
@@ -163,8 +160,7 @@ class LsaPlotting:
 
 def eval_clusters(model: KMeans, X_train: pd.DataFrame, X_eval: pd.DataFrame,
                   X_holdout: pd.DataFrame):
-    """
-    Takes an instance of a KMeans model, train, eval, and holdout df's and
+    """Takes an instance of a KMeans model, train, eval, and holdout df's and
     predicts their labels and creates a df column to hold the labels. Prints
     aggregations of the train and eval by cluster. Also prints the 10 most
     importand features in each cluster as well as a set containing the common
@@ -208,6 +204,11 @@ def eval_clusters(model: KMeans, X_train: pd.DataFrame, X_eval: pd.DataFrame,
 
 def make_kmeans_clusters(train_data, start: int = 2, stop: int = 11,
                          step: int = 1) -> None:
+    '''Takes the train data (in the form of a data frame), with optional
+    'start', 'stop', and 'step' parameters, and returns the KMeans model
+    instantiation parameters, model names, and silhouette scores for both
+    KMeans and MiniBatchKMeans.
+    '''
     models: List = []
     names: List = []
     silhouettes: List = []
@@ -246,8 +247,7 @@ def fit_and_predict(model, params: Dict,
                     y_train: pd.DataFrame,
                     X_eval: pd.DataFrame,
                     y_eval: pd.DataFrame) -> None:
-    """
-    Takes an instantiated sklearn model, training data (X_train, y_train),
+    """Takes an instantiated sklearn model, training data (X_train, y_train),
     and performs cross-validation and then prints the mean of the cross-
     validation accuracies.
     """
