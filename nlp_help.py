@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
-
+from typing import List, Dict
 
 from sklearn.cluster import KMeans, MiniBatchKMeans
 from sklearn.metrics import silhouette_score, confusion_matrix
@@ -16,15 +16,14 @@ from bokeh.models import HoverTool, ColumnDataSource
 from bokeh.palettes import Category10
 from bokeh.plotting import figure, show
 from bokeh.transform import factor_cmap
-from typing import List, Dict
 
 
 class LsaPlotting:
     def __init__(self, X_train_lsa: np.ndarray, y_train: pd.Series,
                  X_eval_lsa: np.ndarray, y_eval: pd.Series):
-        """Takes a X_train and X_eval as numpy ndarrays, and y_train and 
-        y_eval as pd.Series. Creates class attributes based upon these 
-        parameters.
+        """
+        Takes a X_train and X_eval as numpy ndarrays, and y_train and y_eval
+        as pd.Series. Creates class attributes based upon these parameters
         """
         self.X_train_lsa = X_train_lsa
         self.y_train = y_train
@@ -38,7 +37,8 @@ class LsaPlotting:
     def compare_plot_2d(self, train_title: str, eval_title: str,
                         comp_0_label: str = 'Component 0',
                         comp_1_label: str = 'Component 1'):
-        """Takes a train_title, an eval_title, a comp_0_label (X-axis) and a
+        """
+        Takes a train_title, an eval_title, a comp_0_label (X-axis) and a
         comp_1_label (Y-axis)and returns a matplotlib figuer with two
         scatterplots based off the data based into the instance of the class.
         A plot of train on the top and a plot of the eval on the bottom.
@@ -63,8 +63,9 @@ class LsaPlotting:
                         comp_0_label: str = 'Component 0',
                         comp_1_label: str = 'Component 1',
                         comp_2_label: str = 'Component 2'):
-        """Takes a train_title and an eval_title as strings uses them as 
-        titles to matplotlib 3d plots created by using class attributes.
+        """
+        Takes a train_title and an eval_title as strings uses them as titles to
+        matplotlib 3d plots created by using class attributes.
         """
         pairs = {p: c for p, c in zip(self.categories, self.colors)}
         _train_df = pd.DataFrame(self.X_train_lsa)
@@ -105,11 +106,12 @@ class LsaPlotting:
         ax2.legend(loc=2)
 
     def compare_plot_interactive(self, X_train: pd.Series, X_eval: pd.Series):
-        """Takes the self.X_train_lsa object (np.ndarray) and converts in into
+        """
+        Takes the self.X_train_lsa object (np.ndarray) and converts in into
         a df, makes column names based on the number of parameters adds a
         column for the lemmas from the corresponding series as well as the
         target. A colormap and plotly tooltips are created as constants. Plots
-        of the first two components are plotted.
+        of the first two componets are plotted.
         """
         _train = pd.DataFrame(self.X_train_lsa)
         col_names = [f'comp_{i}' for i in range(_train.shape[1])]
@@ -126,7 +128,7 @@ class LsaPlotting:
         hover = HoverTool(tooltips=[('President', '@president'),
                                     ('lemmas', '@lemmas'),
                                     ('Components 0 1',
-                                    ('@comp_1, @comp_2'))])
+                                     ('@comp_1, @comp_2'))])
 
         plot_cmap = factor_cmap('president', palette=Category10[10],
                                 factors=_train.president.unique())
@@ -160,7 +162,8 @@ class LsaPlotting:
 
 def eval_clusters(model: KMeans, X_train: pd.DataFrame, X_eval: pd.DataFrame,
                   X_holdout: pd.DataFrame):
-    """Takes an instance of a KMeans model, train, eval, and holdout df's and
+    """
+    Takes an instance of a KMeans model, train, eval, and holdout df's and
     predicts their labels and creates a df column to hold the labels. Prints
     aggregations of the train and eval by cluster. Also prints the 10 most
     importand features in each cluster as well as a set containing the common
@@ -177,8 +180,8 @@ def eval_clusters(model: KMeans, X_train: pd.DataFrame, X_eval: pd.DataFrame,
     X_holdout['clusters'] = holdout_labels
 
     # aggregate the train and eval by cluster and print
-    print('Train set aggregiated: \n', X_train.groupby(['clusters']).mean())
-    print('\nEval set aggregiated: \n', X_eval.groupby(['clusters']).mean())
+    print('Train set aggregated: \n', X_train.groupby(['clusters']).mean())
+    print('\nEval set aggregated: \n', X_eval.groupby(['clusters']).mean())
 
     # Loop over the train and eval dfs filtered by cluster and eval simularity
     for i in range(model.n_clusters):
@@ -196,19 +199,15 @@ def eval_clusters(model: KMeans, X_train: pd.DataFrame, X_eval: pd.DataFrame,
         evl = data_eval.mean().sort_values(ascending=False)[start:stop].copy()
         print(evl, '\n')
         overlap = {*train.index}.intersection({*evl.index})
-        print(f'There are {len(overlap)} words which are in both training and '
-              'eval')
+        print(
+            f'There are {len(overlap)} features which are in both training',
+            'and eval.')
         if len(overlap) > 0:
-            print(f'These words are {overlap}', '\n')
+            print(f'These features are {overlap}', '\n')
 
 
 def make_kmeans_clusters(train_data, start: int = 2, stop: int = 11,
                          step: int = 1) -> None:
-    '''Takes the train data (in the form of a data frame), with optional
-    'start', 'stop', and 'step' parameters, and returns the KMeans model
-    instantiation parameters, model names, and silhouette scores for both
-    KMeans and MiniBatchKMeans.
-    '''
     models: List = []
     names: List = []
     silhouettes: List = []
@@ -222,7 +221,7 @@ def make_kmeans_clusters(train_data, start: int = 2, stop: int = 11,
         models.append(('KMeans', KMeans(n_clusters=cluster, init='k-means++',
                                         random_state=15)))
 
-        models.append(('MiniBatch', MiniBatchKMeans(n_clusters=cluster,
+        models.append(('MiniKatch', MiniBatchKMeans(n_clusters=cluster,
                                                     init='random',
                                                     batch_size=500)))
 
@@ -246,10 +245,11 @@ def fit_and_predict(model, params: Dict,
                     X_train: pd.DataFrame,
                     y_train: pd.DataFrame,
                     X_eval: pd.DataFrame,
-                    y_eval: pd.DataFrame) -> None:
-    """Takes an instantiated sklearn model, training data (X_train, y_train),
+                    y_eval: pd.DataFrame):
+    """
+    Takes an instantiated sklearn model, training data (X_train, y_train),
     and performs cross-validation and then prints the mean of the cross-
-    validation accuracies.
+    validation accuracies. Returns fitted grid-searched model.
     """
     assert len(X_train) == len(y_train)
     assert len(X_eval) == len(y_eval)
@@ -265,3 +265,54 @@ def fit_and_predict(model, params: Dict,
     y_pred = clf.predict(X_eval)
     print(classification_report(y_eval, y_pred))
     print(confusion_matrix(y_eval, y_pred))
+    return clf
+
+
+def kmeans_centroid_plot(model: KMeans,
+                         train_df: pd.DataFrame, eval_df: pd.DataFrame,
+                         X_train: pd.Series, y_train: pd.Series,
+                         X_eval: pd.Series, y_eval: pd.Series,
+                         train_title: str, eval_title: str,
+                         columns: List[str]) -> None:
+    cluster_centers = model.cluster_centers_[:, :2]
+
+    train_df['cluster'] = model.labels_.astype('str')
+    train_df['president'] = y_train.values
+    train_df['lemmas'] = X_train.values
+
+    eval_df['cluster'] = model.predict(eval_df[columns]).astype('str')
+    eval_df['president'] = y_eval.values
+    eval_df['lemmas'] = X_eval.values
+
+    hover = HoverTool(tooltips=[('Cluster', '@cluster'),
+                                ('President', '@president'),
+                                ('lemmas', '@lemmas')])
+
+    cluster_cmap = factor_cmap('cluster',
+                               palette=Category10[cluster_centers.shape[0]],
+                               factors=eval_df.cluster.unique().astype('str'))
+
+    source_train = ColumnDataSource(train_df)
+    source_eval = ColumnDataSource(eval_df)
+
+    fig_params = {'x_axis_label': 'Component_0', 'y_axis_label': 'Component 1',
+                  'tools': [hover, 'pan', 'wheel_zoom']}
+
+    circle_x_params = {'x': cluster_centers[:, 0], 'y': cluster_centers[:, 1],
+                       'size': 30, 'alpha': .9, 'color': 'firebrick'}
+
+    circle_params = {'x': 'comp_0', 'y': 'comp_1', 'legend': 'cluster',
+                     'fill_color': cluster_cmap, 'size': 10, 'alpha': .3}
+
+    p_train_cluster = figure(title=train_title, **fig_params)
+    p_train_cluster.circle_x(**circle_x_params)
+    p_train_cluster.circle(source=source_train, **circle_params)
+    p_train_cluster.legend.location = 'top_left'
+
+    p_eval_cluster = figure(title=eval_title, **fig_params)
+    p_eval_cluster.circle_x(**circle_x_params)
+    p_eval_cluster.circle(source=source_eval, **circle_params)
+    p_eval_cluster.legend.location = 'top_left'
+
+    layout = row(p_train_cluster, p_eval_cluster)
+    show(layout)
