@@ -221,7 +221,7 @@ def make_kmeans_clusters(train_data, start: int = 2, stop: int = 11,
         models.append(('KMeans', KMeans(n_clusters=cluster, init='k-means++',
                                         random_state=15)))
 
-        models.append(('MiniKatch', MiniBatchKMeans(n_clusters=cluster,
+        models.append(('MiniBatch', MiniBatchKMeans(n_clusters=cluster,
                                                     init='random',
                                                     batch_size=500)))
 
@@ -236,7 +236,7 @@ def make_kmeans_clusters(train_data, start: int = 2, stop: int = 11,
                                           metric='euclidean')
             silhouettes.append(silhouette)
             if silhouette > 0:
-                print(f'Clusters {model.n_clusters}\t silhoutte \
+                print(f'Clusters {model.n_clusters}\t silhouette \
                     {silhouette}\n')
                 print(name, pd.crosstab(y_pred, labels), '\n')
 
